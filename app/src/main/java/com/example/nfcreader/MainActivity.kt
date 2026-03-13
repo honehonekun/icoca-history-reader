@@ -23,9 +23,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -145,14 +142,14 @@ fun NfcScreen(modifier: Modifier = Modifier, status: String, list: List<CardMode
         }
 
         Text(
-            text = if (list.size > 0) {
+            text = if (list.isNotEmpty()) {
                 "残高:￥${list[0].credit}"
             } else {
                 "残高がここに表示されます"
             }, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(16.dp))
-        if (list.size == 0) {
+        if (list.isEmpty()) {
             Spacer(Modifier.weight(1F))
         }
         HorizontalDivider()
