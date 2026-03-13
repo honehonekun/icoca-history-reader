@@ -1,6 +1,8 @@
 icoca(suicaは未テスト)の履歴を読み取るアプリ  
-![Image](https://github.com/user-attachments/assets/462e7883-77ff-45f2-baae-f66b2784ea6c)
-![Image](https://github.com/user-attachments/assets/acf8cbb3-fb6e-4204-bf1b-3127a0c437c8)
+
+
+<img src="https://github.com/user-attachments/assets/462e7883-77ff-45f2-baae-f66b2784ea6c" width="100">
+<img src="https://github.com/user-attachments/assets/acf8cbb3-fb6e-4204-bf1b-3127a0c437c8" width="100">
   
 機能  
 -残高表示  
