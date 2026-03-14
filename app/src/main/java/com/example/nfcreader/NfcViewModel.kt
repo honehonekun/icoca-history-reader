@@ -41,10 +41,40 @@ class NfcViewModel(application: Application) : AndroidViewModel(application) {
             status = "このデバイスはNFCに対応していません"
         }
     }
-
     fun disableForegroundDispatch(activity: Activity) {
         nfcAdapter?.disableForegroundDispatch(activity)
     }
+
+
+    //ReaderModeを使用
+    fun enableReaderMode(activity: Activity) {
+        val options = android.os.Bundle()
+        // 応答待ち時間を短く設定（必要に応じて）
+        // options.putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 250)
+
+        nfcAdapter?.enableReaderMode(
+            activity,
+            { tag ->
+                // 別スレッドで処理されるため、直接processTagを呼ぶ
+                processTag(tag)
+            },
+            NfcAdapter.FLAG_READER_NFC_F or
+                    NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, // これが重要
+            options
+        )
+    }
+    private fun processTag(tag: Tag) {
+        viewModelScope.launch {
+            status = "読み取り中"
+            status = readTagData(tag)
+        }
+    }
+
+
+    fun disableReaderMode(activity: Activity) {
+        nfcAdapter?.disableReaderMode(activity)
+    }
+
 
     fun processIntent(intent: android.content.Intent) {
         val tag: android.nfc.Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -56,6 +86,7 @@ class NfcViewModel(application: Application) : AndroidViewModel(application) {
         tag?.let {
             // ここで読み取り処理を行う（例：IDを取得）
             viewModelScope.launch {
+                status = "読み取り中"
                 status = readTagData(it)
             }
         }
@@ -76,16 +107,16 @@ class NfcViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 //make response
-                val command1 = commandMaker(idm, 0, 10)
-                val command2 = commandMaker(idm, 10, 10)
+                val command1 = commandMaker(idm, 0, 12)
+                val command2 = commandMaker(idm, 12, 8)
 
                 val response1WithUnnecessaryData = felicaCard.transceive(command1)
                 val response2WithUnnecessaryData = felicaCard.transceive(command2)
 
                 val response = ByteArray(16 * 20)
 
-                System.arraycopy(response1WithUnnecessaryData, 13, response, 0, 16 * 10)
-                System.arraycopy(response2WithUnnecessaryData, 13, response, 16 * 10, 16 * 10)
+                System.arraycopy(response1WithUnnecessaryData, 13, response, 0, 16 * 12)
+                System.arraycopy(response2WithUnnecessaryData, 13, response, 16 * 12, 16 * 8)
 
                 history = historyLoader(getApplication(),response)
                 felicaCard.close()

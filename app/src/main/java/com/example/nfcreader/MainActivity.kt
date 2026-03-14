@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -70,21 +71,21 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        nfcViewModel.enableForegroundDispatch(this, pendingIntent)
+        nfcViewModel.enableReaderMode(this)
     }
 
     override fun onPause() {
         super.onPause()
-        nfcViewModel.disableForegroundDispatch(this)
+        nfcViewModel.disableReaderMode(this)
     }
 
     //待機してインテントが発生したら実行　（アプリ実行時用）
-    override fun onNewIntent(intent: Intent) {
+    /*override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         // ViewModelにデータを渡して解析してもらう
         setIntent(intent)
         nfcViewModel.processIntent(intent)
-    }
+    }*/
 }
 
 @Composable
@@ -130,12 +131,23 @@ fun NfcScreen(modifier: Modifier = Modifier, status: String, list: List<CardMode
 
 
         Card(
-            modifier = Modifier.padding(32.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
+            modifier = if (status == "読み込み成功") {
+                Modifier.padding(32.dp).shadow(32.dp, RoundedCornerShape(20.dp), ambientColor = colorResource(R.color.teal_200), spotColor = colorResource(R.color.teal_200),)
+            }
+            else if(status != "読み取り準備完了\nカードをタッチしてください" && status != "読み取り中"){
+                Modifier.padding(32.dp).shadow(32.dp, RoundedCornerShape(20.dp), ambientColor = colorResource(R.color.redorange), spotColor = colorResource(R.color.redorange),)
+            }
+            else{
+                Modifier.padding(32.dp)
+            },
             shape = RoundedCornerShape(20.dp),
-            colors = if (list.isNotEmpty()) {
+            colors = if (status == "読み込み成功") {
                 CardDefaults.cardColors(colorResource(R.color.blue))
-            }else{
+            }
+            else if(status != "読み取り準備完了\nカードをタッチしてください" && status != "読み取り中"){
+                CardDefaults.cardColors(colorResource(R.color.redorange))
+            }
+            else{
                 CardDefaults.cardColors(colorResource(R.color.gray))
             }
         ) {
